@@ -5,7 +5,11 @@ block content
   p Welcome to #{title}
   script(src="/socket.io/socket.io.js")
   script.
-    var socket = io('//'+document.location.hostname);
+   // console.log(document.location.hostname)
+   //var socket = io('//'+document.location.hostname);
+   var socket = io()
+   console.log("here")
+   console.log(socket)
     socket.on('socketToMe', function (data) {
       console.log(data);
     });

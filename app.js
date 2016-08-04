@@ -5,12 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
+var db = require('./models/db');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var expressWs = require('express-ws')(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,6 +40,16 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+  next();
+});
+
 
 // error handlers
 

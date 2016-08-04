@@ -1,0 +1,11 @@
+{
+    "express" : {
+        "port": 3004
+    },
+    "database": {
+        "mongo": {
+            "name": "chat"
+        }
+    }
+}
+
