@@ -14,7 +14,10 @@ router.get('/', function(req, res, next) {
 });
 
 
+router.get('/login', userHandler.validateUserAtLogin);
 router.get('/online', userHandler.getOnlineUsers);
+router.get('/onlineAdmin', userHandler.getOnlineAdmin);
+router.get('/disconnect',userHandler.disconnect)
 
 
 module.exports = router;

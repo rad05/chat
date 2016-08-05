@@ -2,42 +2,35 @@ var userModel = require('../models/user')
 var messageModel = require('../models/message')
 var adminUsers ={}
 var users ={}
+var responseJSON = {
+    "status": 1,
+    "msg": "success"
+};
 
-/*
- socket.on('login validation',function(loginInfo,callback){
- validateloginCreds(loginInfo,function(userFoundErr,userFound){
- if(userFoundErr){
- throw userFoundErr
- }
- if(userFound==null || !userFound){
- callback(false)
- }
- else{
- callback(true)
- if(userFound.admin){
- loginInfo.admin=userFound.admin
- socket.admin= userFound.admin
- socket.nickname = loginInfo.un
- socketInfo[socket.admin]=socket
- }
- else{
- socket.nickname = loginInfo.un
- users[socket.nickname]=socket
- }
 
- socket.emit('chat page',loginInfo)
- }
- })
- })
- */
+function validateloginCreds(name,password,callback) {
+
+    userModel.user.findOne({userName: name, password: password}, {
+        _id: 1,
+        admin: 1,
+        userName: 1,
+        firstName:1,
+        lastName:1
+    }, function (userFoundErr, userFound) {
+        if(userFoundErr){
+            callback(userFoundErr)
+        }
+        callback(null,userFound)
+
+    })
+}
 
 
 
-function getOnlineUsers(req,res,next){
-    //console.log(res.io)
+
+function validateUserAtLogin(req,res,next){
     var nameAtLogin = req.query.userName
     var passwordAtLogin = req.query.password
-    console.log(nameAtLogin)
 
 
 
@@ -51,33 +44,26 @@ function getOnlineUsers(req,res,next){
             responseJson.status =0
             responseJson.msg = "validation failed"
             res.send(responseJson)
-            // send message
+
         }
         else {
+            // if the user is a regular client (not an admin)
             if (!userFound.admin) {
-                /* if(userFound.admin){
-                 /*console.log("user is an admin")
-                 responseJson={}
-                 res.io.userName = userFound.userName
-                 res.io.admin = userFound.admin
-                 adminUsers[res.io.admin]=res.io
-                 console.log(Object.keys( adminUsers))
-
-                 }*/
-
-                console.log("user's not an admin !!")
                 res.io.userName = userFound.userName
+                res.io.admin=1
                 users[res.io.userName] = res.io
-                responseJson = {}
-                console.log(Object.keys(users))
-                var onlineUsers = Object.keys(users)
-                responseJson={}
-                responseJson.status =0
-                responseJson.onlineUsers = onlineUsers
-                res.json(responseJson)
-
-
+                //var onlineUsers = Object.keys(users)
+                responseJSON.role =0
+                res.send(responseJSON)
+                return
             }
+           if(userFound.admin){
+                res.io.userName = userFound.firstName
+                adminUsers[res.io.userName] = res.io
+                responseJSON.role =1
+                res.send(responseJSON)
+                return
+           }
         }
     })
 
@@ -85,24 +71,62 @@ function getOnlineUsers(req,res,next){
 }
 
 
-function validateloginCreds(name,password,callback) {
+function getOnlineUsers(req,res,next){
+    var onlineUsers = Object.keys(users)
+    if(!onlineUsers.length){
+        responseJSON.onlineUsers= "no users online"
+        res.send(responseJSON)
+        return
+    }
+    console.log(onlineUsers)
+    responseJSON.onlineUsers = onlineUsers
+    res.send(responseJSON)
+    return
 
-    userModel.user.findOne({userName: name, password: password}, {
-        _id: 1,
-        admin: 1,
-        userName: 1,
-    }, function (userFoundErr, userFound) {
-        if(userFoundErr){
-            callback(userFoundErr)
-        }
-        callback(null,userFound)
+}
 
-    })
+
+function getOnlineAdmin(req,res,next){
+    var onlineAdmin =  Object.keys(adminUsers)
+    if(!onlineAdmin .length){
+        responseJSON.onlineAdmin= "no admin online"
+        res.send(responseJSON)
+        return
+    }
+    responseJSON.onlineAdmin = onlineAdmin
+    res.send(responseJSON)
+    return
+
+}
+
+
+function disconnect(req,res,next){
+    var userName =req.query.userName
+    console.log(adminUsers)
+    console.log(users)
+    Object.keys(adminUsers)
+        // set status to false in connections where admin:this.admin
+        // update count to 0
+      //  delete socketInfo[socket.admin]
+
+
+
+
+
 }
 
 
 
-exports.getOnlineUsers = getOnlineUsers;
+
+
+
+
+
+
+exports.validateUserAtLogin = validateUserAtLogin;
+exports.getOnlineUsers = getOnlineUsers
+exports.getOnlineAdmin= getOnlineAdmin
+exports.disconnect = disconnect
 
 
 
