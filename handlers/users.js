@@ -15,14 +15,18 @@ var responseJSON = {
          if(userNameErr){
              throw userNameErr
          }
-        if(userNameFound.userName){
-            callback(null,userNameFound)
+         if(userNameFound==null){
+             callback(null,null)
+         }
+         else
+         {
+            callback(null,userNameFound.userName)
         }
      })
  }
 
 
-function insertUserRegisrationData(firstName,lastName,userName,password,callback){
+function insertUserRegistrationData(firstName,lastName,userName,password,callback){
     var userData = new userModel.user({
         firstName: firstName,
         lastname: lastName,
@@ -67,29 +71,28 @@ function registerUser(req,res,next){
     var lastName = req.body.lastName;
     var userName= req.body.userName;
     var password = req.body.password;
-    // check for userNsame
+    // check for userName
     isUserNameUnique(userName,function(userNameUniqueErr,userNameUniqueCheck){
         console.log("value from username unique calback ")
         console.log(userNameUniqueCheck)
         if(userNameUniqueErr){
             throw userNameUniqueErr
         }
-        if(userNameUniqueCheck==1){  // no username found
-            insertUserRegisrationData(firstName,lastName,userName,password,function(insertUserDataErr,insertUserData){
+        if(userNameUniqueCheck==null){  // no username found
+            insertUserRegistrationData(firstName,lastName,userName,password,function(insertUserDataErr,insertUserData){
                 if(insertUserDataErr){
                     throw insertUserDataErr
                 }
                 // console.log(insertUserData)
-                responseJSON.msg = "usernsame unique"
+                responseJSON.msg = "registeration is successful"
                 res.send(responseJSON)
             })
 
         }
-        if(userNameUniqueCheck==0){
+        else{
             console.log("userName presetn")
             responseJSON.msg = "userName is not unique"
             res.send(responseJSON)
-
         }
 
     })
