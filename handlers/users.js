@@ -63,7 +63,7 @@ function validateloginCreds(name,password,callback) {
 }
 
 
-
+// ALL API"s
 
 
 function registerUser(req,res,next){
@@ -122,6 +122,7 @@ function validateUserAtLogin(req,res,next){
             // if the user is a regular client (not an admin)
             if (!userFound.admin) {
                 res.io.userName = userFound.userName
+                res.io.admin=1
                 //res.io.admin=1
                 users[res.io.userName] = res.io
                 //var onlineUsers = Object.keys(users)
@@ -144,6 +145,11 @@ function validateUserAtLogin(req,res,next){
 
 
 function getOnlineUsers(req,res,next){
+    /*console.log("USERS")
+    console.log(users)
+    console.log("ADMIN USERS")
+    console.log(adminUsers)*/
+
     var onlineUsers = Object.keys(users)
     var onlineAdminUsers = Object.keys(adminUsers)
     if(!onlineUsers.length && !onlineAdminUsers.length){
@@ -162,19 +168,29 @@ function getOnlineUsers(req,res,next){
 
 }
 
-// get all users and admin online
-/*function getOnlineAdmin(req,res,next){
-    var onlineAdmin =  Object.keys(adminUsers)
-    if(!onlineAdmin .length){
-        responseJSON.onlineAdmin= "no admin online"
-        res.send(responseJSON)
-        return
-    }
-    responseJSON.onlineAdmin = onlineAdmin
-    res.send(responseJSON)
-    return
+//gets the admin firstName ,the client's userName and the message
+// to , from , message
+function sendMessage(req,res,next){
+ var to =req.query.to //username : s , firstName: waldo
+    var from = req.query.from
+    var message = req.query.message
+    if(res.io.admin){
 
-}*/
+    }
+
+        /*
+         users[sendmessageTo].emit('private message',{msg:message,nickName:socket.nickname,admin:1,to:to}) // betty(me) sending messages to ronnie(you)
+         //socket.emit('private message',{msg:message,nickName:socket.nickname })
+         socket.emit('private message',{msg:message,nickName:socket.admin,ack:'ok',admin:1,to:to})
+         io.to(receiversSocket.id).emit('notification', {sentBy:socket.nickname})
+         */
+
+
+}
+
+
+
+
 
 
 function disconnect(req,res,next){
